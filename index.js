@@ -1,16 +1,9 @@
 const { Requester } = require("@chainlink/external-adapter");
 const Rekognition = require("node-rekognition");
-const pinataSDK = require("@pinata/sdk");
 const https = require("https");
 const Stream = require("stream").Transform;
-const bs58 = require("bs58");
 
 const createRequest = async (input, callback) => {
-  const pinata = pinataSDK(
-    process.env.PINATA_API_KEY,
-    process.env.PINATA_SECRET_API_KEY
-  );
-
   const AWSParameters = {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -22,17 +15,11 @@ const createRequest = async (input, callback) => {
   return performRequest({
     input,
     callback,
-    pinata,
     rekognition
-  })
-}
+  });
+};
 
-const performRequest = ({
-  input,
-  callback,
-  pinata,
-  rekognition
-}) => {
+const performRequest = ({ input, callback, rekognition }) => {
   const { data, id: jobRunID } = input;
 
   if (!data) {
@@ -50,9 +37,8 @@ const performRequest = ({
   if (hash === undefined) {
     callback(500, Requester.errored(jobRunID, "Content hash required"));
   } else {
-    const url = `https://gateway.ipfs.io/ipfs/${hash}`;
+    const url = `https://${process.env.IPFS_GATEWAY_URL}/ipfs/${hash}`;
 
-    console.log(url);
     try {
       https
         .request(url, function(response) {
@@ -74,17 +60,15 @@ const performRequest = ({
             imgBytes
           );
 
+          const convertedResult = convertLabelsToTrueSightFormat(
+            moderationLabels.ModerationLabels
+          );
+
           const response = {
             data: moderationLabels
           };
 
-          const pinataResponse = await pinata.pinJSONToIPFS(response.data);
-
-          const { IpfsHash } = pinataResponse;
-
-          const asBytes32 = getBytes32FromIpfsHash(IpfsHash);
-
-          response.data.result = asBytes32;
+          response.data.result = convertedResult;
 
           callback(200, Requester.success(jobRunID, response));
         } catch (error) {
@@ -97,11 +81,37 @@ const performRequest = ({
       callback(500, Requester.errored(jobRunID, error));
     }
   }
-}
+};
 
-const getBytes32FromIpfsHash = (ipfsListing) => {
-  return "0x"+bs58.decode(ipfsListing).slice(2).toString('hex')
-}
+const getConfidenceForLabel = (labelsData, labelToFind) => {
+  const matchingLabels = labelsData.filter(
+    label => label.Name.toLowerCase() === labelToFind.toLowerCase()
+  );
+
+  if (!matchingLabels || matchingLabels.length === 0) {
+    return null;
+  }
+
+  return Math.round(parseFloat(matchingLabels[0].Confidence));
+};
+
+const convertLabelsToTrueSightFormat = labels => {
+  const adultConfidence = getConfidenceForLabel(labels, "Explicit Nudity");
+  const suggestiveConfidence = getConfidenceForLabel(labels, "Suggestive");
+  const violenceConfidence = getConfidenceForLabel(labels, "Violence");
+  const visuallyDisturbingConfidence = getConfidenceForLabel(labels, 
+    "Visually Disturbing"
+  );
+  const hateSymbolsConfidence = getConfidenceForLabel(labels, "Hate Symbols");
+
+  return [
+    adultConfidence,
+    suggestiveConfidence,
+    violenceConfidence,
+    visuallyDisturbingConfidence,
+    hateSymbolsConfidence
+  ].join(",");
+};
 
 // This is a wrapper to allow the function to work with
 // GCP Functions

@@ -23,12 +23,6 @@ const createRekognitionStub = () =>
     })
   });
 
-const createPinataStub = () => ({
-  pinJSONToIPFS: sinon.stub().returns({
-    IpfsHash: "QmWATWQ7fVPP2EFGu71UkfnqhYXDYH566qy47CnJDgvs8u"
-  })
-});
-
 describe("performRequest", () => {
   const jobID = "1";
 
@@ -45,8 +39,6 @@ describe("performRequest", () => {
 
     requests.forEach(req => {
       it(`${req.name}`, done => {
-        var pinata = createPinataStub();
-
         var rekognitionStub = createRekognitionStub();
 
         performRequest({
@@ -57,7 +49,6 @@ describe("performRequest", () => {
             assert.isNotEmpty(data.data);
             done();
           },
-          pinata: pinata,
           rekognition: rekognitionStub
         });
       });

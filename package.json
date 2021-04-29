@@ -1,5 +1,5 @@
 {
-  "name": "IpfsRekognitionExternalAdapter",
+  "name": "GenesisEA_Rekognition",
   "version": "0.1.0",
   "author": "",
   "description": "",
@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "@chainlink/external-adapter": "^0.2.6",
-    "@pinata/sdk": "^1.1.13",
-    "bs58": "^4.0.1",
     "dotenv": "^8.2.0",
     "node-rekognition": "^0.4.0"
   },
