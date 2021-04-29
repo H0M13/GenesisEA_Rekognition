@@ -42,9 +42,9 @@ You will need an AWS account to be able to make requests to Amazon Rekognition. 
       }
     ],
     "ModerationModelVersion": "4.0",
-    "result": ",75,,,"
+    "result": "0,75,0,0,0"
   },
-  "result": ",75,,,"
+  "result": "0,75,0,0,0"
 }
 ```
 

@@ -88,8 +88,11 @@ const getConfidenceForLabel = (labelsData, labelToFind) => {
     label => label.Name.toLowerCase() === labelToFind.toLowerCase()
   );
 
+  // Rekognition is able to determine all of the labels in our results format
+  // so a missing label indicates some confidence the label does not exist.
+  // => Return a 0 score instead of null
   if (!matchingLabels || matchingLabels.length === 0) {
-    return null;
+    return 0;
   }
 
   return Math.round(parseFloat(matchingLabels[0].Confidence));
