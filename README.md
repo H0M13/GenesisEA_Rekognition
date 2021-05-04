@@ -6,11 +6,12 @@ This external adapter downloads image bytes from [IPFS](https://ipfs.io/) given 
 
 You will need an AWS account to be able to make requests to Amazon Rekognition. See [Amazon's documentation](https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/) for help on setting up an account.
 
-| Variable                |              | Description                          |            Example             |
-| ----------------------- | :----------: | ------------------------------------ | :----------------------------: |
-| `AWS_ACCESS_KEY_ID`     | **Required** | The ID of your AWS access key        |        `ABCDEFGABCDEFG`        |
-| `AWS_SECRET_ACCESS_KEY` | **Required** | Your AWS secret access key           | `AbCdEfGaBcDeFgAbCdEfGaBcDeFg` |
-| `AWS_REGION`            | **Required** | The AWS region you would like to use |          `eu-west-2`           |
+| Variable                |              | Description                            |            Example             |
+| ----------------------- | :----------: | -------------------------------------- | :----------------------------: |
+| `AWS_ACCESS_KEY_ID`     | **Required** | The ID of your AWS access key          |        `ABCDEFGABCDEFG`        |
+| `AWS_SECRET_ACCESS_KEY` | **Required** | Your AWS secret access key             | `AbCdEfGaBcDeFgAbCdEfGaBcDeFg` |
+| `AWS_REGION`            | **Required** | The AWS region you would like to use   |          `eu-west-2`           |
+| `IPFS_GATEWAY_URL`      | **Required** | The IPFS gateway you would like to use |          `ipfs.io`             |
 
 ## Example request
 
