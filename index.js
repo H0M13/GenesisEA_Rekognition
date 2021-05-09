@@ -1,7 +1,11 @@
 const { Requester } = require("@chainlink/external-adapter");
 const Rekognition = require("node-rekognition");
-const https = require("https");
 const Stream = require("stream").Transform;
+
+const isNonSsl =
+  process.env.IPFS_GATEWAY_SSL &&
+  process.env.IPFS_GATEWAY_SSL.toLowerCase() === "false";
+const httpProtocol = isNonSsl ? require("http") : require("https");
 
 const createRequest = async (input, callback) => {
   const AWSParameters = {
@@ -37,10 +41,11 @@ const performRequest = ({ input, callback, rekognition }) => {
   if (hash === undefined) {
     callback(500, Requester.errored(jobRunID, "Content hash required"));
   } else {
-    const url = `https://${process.env.IPFS_GATEWAY_URL}/ipfs/${hash}`;
+    const protocol = isNonSsl ? "http" : "https";
+    const url = `${protocol}://${process.env.IPFS_GATEWAY_URL}/ipfs/${hash}`;
 
     try {
-      https
+      httpProtocol
         .request(url, function(response) {
           var imgBytesStream = new Stream();
 
